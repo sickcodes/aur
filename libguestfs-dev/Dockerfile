@@ -7,7 +7,7 @@
 # Website:          https://sick.codes
 # 
 #   docker build -t libguestfs-dev .
-#   docker run  libguestfs-dev
+#   docker rm libguestfs-dev
 #   docker run --name libguestfs-dev libguestfs-dev
 #   docker cp . libguestfs-dev:/home/arch/aur/libguestfs-dev/
 
