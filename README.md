@@ -10,9 +10,14 @@ Contact methods:
 [Sick.Codes Contact Form](https://sick.codes)
 
 ```bash
+# internal use only:
+
 # update .SRCINFO
 makepkg --printsrcinfo > .SRCINFO
 
 # patch
-git format-patch -2 HEAD
+git format-patch -1 HEAD
+
+# makepkg clean
+makepkg -sci
 ```

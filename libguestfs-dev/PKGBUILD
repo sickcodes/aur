@@ -8,7 +8,7 @@
 
 pkgname=libguestfs-dev
 _pkgname=libguestfs
-pkgver=1.45.6.r1.e68a844eb406f0b32cc2c4e60ca66bc1a7f94bdc
+pkgver=1.45.6.r0.g6410c9984
 pkgrel=1
 pkgdesc="libguestfs Development - Access and modify virtual machine disk image - Staging Development Version"
 arch=("i686" "x86_64")
@@ -59,7 +59,7 @@ makedepends=(#"qemu-headless"
     "ocaml"
     "go"
     "rust")
-    optdepends=("python: Python bindings"
+optdepends=("python: Python bindings"
     "ruby: Ruby Bindings"
     # "gjs: Javascript Bindings for GNOME"
     # "php: PHP bindings"
@@ -74,23 +74,23 @@ conflicts=("${_pkgname}")
 options=()
 source=("git+https://github.com/libguestfs/libguestfs#commit=6410c99844a36216b2425c4a6f3cd5a44e1bdb2d"
     "git+https://git.savannah.gnu.org/git/gnulib.git"
-    "git+https://github.com/libguestfs/libguestfs-common"
-    "update-libguestfs-appliance")
+    "git+https://github.com/libguestfs/libguestfs-common")
+    # "update-libguestfs-appliance")
 sha512sums=(
     'SKIP'
     'SKIP'
-    'SKIP'
     'SKIP')
+    # 'SKIP')
+    
 
 pkgver() {
     cd "${srcdir}/${_pkgname}"
-    
     git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 prepare() {
     cd "${srcdir}/${_pkgname}"
-
+    sed -i 's/ Sys::Virt / /g' m4/guestfs-perl.m4
     git submodule init
     git config submodule.gnulib.url "${srcdir}/gnulib"
     git config submodule.common.url "${srcdir}/libguestfs-common"
@@ -118,44 +118,67 @@ build() {
     # bindings uncomment the appropriate line in makedepends and remove the
     # --disable-* option in ./configure
 
+    sed -i -e 's/linguas_translated\ \=\ ja\ uk//' po-docs/Makefile.am
+    # sed -i -e 's/po\-docs//g' Makefile
+    sed -i -e 's/po\-docs//g' Makefile.am
 
-    ./autogen.sh || autoreconf -i
+    rm -f po-docs/Makefile.am
+    rm -f po-docs/ja/Makefile.am
+    rm -f po-docs/uk/Makefile.am
+    rm -f po-docs/language.mk
+
+    sed -i -e 's/SUBDIRS\ \+\=\ po\-docs//' Makefile.am
+    sed -i -e 's/SUBDIRS\ \+\=\ po\-docs/SUBDIRS\ \+\=\ \"\"/' Makefile.am
+
+    sed -i -e 's/po\-docs\/ja\/Makefile//g'  configure.ac
+    sed -i -e 's/po\-docs\/uk\/Makefile//g'  configure.ac
+    sed -i -e 's/po\-docs\/Makefile//g'      configure.ac
+
+    git submodule update --init
+
+    ./autogen.sh || autoreconf -fi
     ./configure \
+        CFLAGS=-fPIC \
         --prefix=/usr \
         --libdir=/usr/lib \
-        --mandir=/usr/share/man \
         --sysconfdir=/etc \
+        --sbindir=/usr/bin \
         --disable-static \
         --disable-probes \
-        --disable-appliance \
-        --disable-daemon \
         --without-java \
         --enable-introspection=no \
         --disable-lua \
         --disable-erlang \
+        --disable-ruby \
         --disable-php \
-        --disable-haskell # \
-        #    --disable-ruby \
-        #    --disable-gobject \
-        #    --disable-golang
+        --with-extra-packages="libldm systemd-sysvcompat openssh qemu-headless" \
+        --with-guestfs-path=/usr/lib/guestfs \
+        --disable-gobject \
+        --disable-golang \
+        --disable-haskell \
+        
+        # --mandir=/usr/share/man \
+        # --disable-appliance \
+        # --disable-daemon \
 
-    if ! make; then
-        _fix_pod_files
-        make
-    fi
+    make # || { _fix_pod_files ; make ; }
+
     # for some reason ruby is not properly made (albeit enabled)
-    make -C ruby
+    # make -C ruby
 }
 
 package() {
     cd "${srcdir}/${_pkgname}"
-    if ! make DESTDIR="${pkgdir}" install; then
-        _fix_pod_files
-        make DESTDIR="${pkgdir}" install
-    fi
+
+    # if ! make DESTDIR="${pkgdir}" install; then
+    #     _fix_pod_files
+    #     make DESTDIR="${pkgdir}" install
+    # fi
+
+    make DESTDIR="${pkgdir}" install
 
     mkdir -p "${pkgdir}/usr/lib/guestfs" "${pkgdir}/var/cache/guestfs"
-    install -Dm755 \
-        "${srcdir}/update-libguestfs-appliance" "${pkgdir}/usr/bin/update-libguestfs-appliance"
+    # install -Dm755 \
+    #     "${srcdir}/update-libguestfs-appliance" "${pkgdir}/usr/bin/update-libguestfs-appliance"
 }
 
