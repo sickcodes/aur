@@ -29,6 +29,7 @@ rm -rf /tmp/aur
 cd /tmp
 git clone https://github.com/sickcodes/aur
 cd "aur/${PACKAGE}"
+PARENT_COMMIT="$(git log --branches -1  --pretty=format:"%H"  | tail -n1)"
 git clone "https://aur.archlinux.org/${PACKAGE}.git" "./.${PACKAGE}"
 cp -rf * "./.${PACKAGE}/"
 cd "./.${PACKAGE}/"
