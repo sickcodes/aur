@@ -20,7 +20,7 @@ backup=("etc/libguestfs-tools.conf"
 install="appliance.install"
 depends=(qemu-headless augeas hivex libconfig libvirt fuse
          file cpio jansson supermin)
-makedepends=(pcre cdrkit git libxml2 gperf rpcsvc-proto python perl
+makedepends=(pcre cdrtools git libxml2 gperf rpcsvc-proto python perl
              perl-string-shellquote perl-libintl-perl perl-sys-virt
              perl-module-build po4a ruby-rdoc ruby-rake rust
              gobject-introspection ocaml-findlib ocaml go)
