@@ -36,7 +36,11 @@ makepkg --printsrcinfo > .SRCINFO
 
 git remote add label "ssh://aur@aur.archlinux.org/${PACKAGE}.git"
 git fetch --all
-git push
+git ls-files --modified | xargs git add
+git commit -m "Update to https://github.com/sickcodes/aur/commit/${PARENT_COMMIT}"
+# git checkout -b label
+
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_aur' git push label master
 ```
 
 
