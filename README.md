@@ -24,6 +24,7 @@ makepkg -sci
 
 
 ```bash
+cd /tmp
 PACKAGE=libguestfs-dev
 rm -rf /tmp/aur
 cd /tmp
