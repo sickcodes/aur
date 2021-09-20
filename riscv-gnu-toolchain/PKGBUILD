@@ -47,7 +47,6 @@ package() {
 
   cp -ra "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
   cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
-  cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/share/
   cp -ra "${srcdir}"/riscv/bin/* "${pkgdir}"/bin/
   cp -ra "${srcdir}"/riscv/lib/* "${pkgdir}"/lib/
 
