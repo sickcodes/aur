@@ -40,10 +40,10 @@ package() {
   rm -rf "${srcdir}"/riscv/riscv64-unknown-elf
   rm -rf "${srcdir}"/riscv/riscv32-unknown-elf
 
-  mkdir -p "${pkgdir}"/usr/libexec/
-  mkdir -p "${pkgdir}"/usr/share/
-  mkdir -p "${pkgdir}"/bin/
-  mkdir -p "${pkgdir}"/lib/
+  install -dm755 ${pkgdir}/usr/libexec
+  install -dm755 ${pkgdir}/usr/share
+  install -dm755 ${pkgdir}/bin
+  install -dm755 ${pkgdir}/lib
 
   cp -ra "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
   cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
@@ -53,9 +53,14 @@ package() {
   # strip host binaries
   find "${pkgdir}"/bin/ "${pkgdir}"/lib/gcc/ -type f -and \( -executable \) -exec strip '{}' \;
 
-  # Remove files that conflict with host gcc package
-  rm -r "${pkgdir}"/usr/share/man/man7
-  rm -r "${pkgdir}"/usr/share/info
-  rm "${pkgdir}"/usr/lib/libcc1.*
+  # Remove existing conflicts
+  rm -rf "${pkgdir}"/usr/share/man/man7
+  rm -rf "${pkgdir}"/lib/libcc1.so*
+  rm -rf "${pkgdir}"/lib/bfd-plugins/libdep.so
+  rm -rf "${pkgdir}"/usr/share/gcc-11.1.0/python/libstdcxx
+  rm -rf "${pkgdir}"/usr/share/gdb/python/gdb
+  rm -rf "${pkgdir}"/usr/share/gdb/syscalls
+  rm -rf "${pkgdir}"/usr/share/gdb/system-gdbinit
+  rm -rf "${pkgdir}"/usr/share/info
 
 }
