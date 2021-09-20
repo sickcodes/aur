@@ -51,7 +51,7 @@ package() {
   cp -ra "${srcdir}"/riscv/lib/* "${pkgdir}"/lib/
 
   # strip host binaries
-  find "${pkgdir}"/usr/bin/ "${pkgdir}"/usr/lib/gcc/ -type f -and \( -executable \) -exec strip '{}' \;
+  find "${pkgdir}"/bin/ "${pkgdir}"/lib/gcc/ -type f -and \( -executable \) -exec strip '{}' \;
 
   # Remove files that conflict with host gcc package
   rm -r "${pkgdir}"/usr/share/man/man7
