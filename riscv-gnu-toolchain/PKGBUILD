@@ -41,11 +41,12 @@ package() {
   rm -rf "${srcdir}"/riscv/riscv32-unknown-elf
 
   mkdir -p "${pkgdir}"/usr/libexec/
-  mkdir -p "${pkgdir}"/share/
+  mkdir -p "${pkgdir}"/usr/share/
   mkdir -p "${pkgdir}"/bin/
   mkdir -p "${pkgdir}"/lib/
 
   cp -ra "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
+  cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
   cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/share/
   cp -ra "${srcdir}"/riscv/bin/* "${pkgdir}"/bin/
   cp -ra "${srcdir}"/riscv/lib/* "${pkgdir}"/lib/
