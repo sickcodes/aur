@@ -45,10 +45,10 @@ package() {
   install -dm755 ${pkgdir}/bin
   install -dm755 ${pkgdir}/lib
 
-  cp -ra "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
-  cp -ra "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
-  cp -ra "${srcdir}"/riscv/bin/* "${pkgdir}"/bin/
-  cp -ra "${srcdir}"/riscv/lib/* "${pkgdir}"/lib/
+  cp -pvr "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
+  cp -pvr "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
+  cp -pvr "${srcdir}"/riscv/bin/* "${pkgdir}"/bin/
+  cp -pvr "${srcdir}"/riscv/lib/* "${pkgdir}"/lib/
 
   # strip host binaries
   find "${pkgdir}"/bin/ "${pkgdir}"/lib/gcc/ -type f -and \( -executable \) -exec strip '{}' \;
