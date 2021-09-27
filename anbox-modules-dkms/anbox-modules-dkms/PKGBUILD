@@ -53,4 +53,7 @@ package() {
   
 }
 
+# sudo modprobe binder_linux devices=binder,hwbinder,vndbinder,anbox-binder,anbox-hwbinder,anbox-vndbinder
+# sudo modprobe ashmem_linux
+
 # vim:set ts=2 sw=2 et:
