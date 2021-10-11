@@ -1,13 +1,15 @@
-# Maintainer: Robin Broda <coderobe @ archlinux.org>
+# Maintainer: Sick Codes <info at sick dot codes>
+# Contributor: Robin Broda <coderobe @ archlinux.org>
 # Contributor: Peter Wu <peter@lekensteyn.nl>
 # Contributor: Evaggelos Balaskas <eblaskas _AT_ ebalaskas _DOT_ gr>
 # Contributor: Xiao-Long Chen <chenxiaolong@cxl.epac.to>
 # Contributor: Nikos Skalkotos <skalkoto (at) Gmail.com>
 
-pkgname=libguestfs
-pkgver=1.44.1
+pkgname=libguestfs-bin
+_pkgname=libguestfs
+pkgver=1.46.0
 _pkgver_short=${pkgver%.*}
-pkgrel=6
+pkgrel=1
 pkgdesc="Access and modify virtual machine disk images"
 arch=('x86_64')
 url="http://libguestfs.org/"
@@ -34,8 +36,8 @@ backup=('etc/libguestfs-tools.conf'
         'etc/xdg/virt-builder/repos.d/libguestfs.gpg'
         'etc/xdg/virt-builder/repos.d/opensuse.conf'
         'etc/xdg/virt-builder/repos.d/opensuse.gpg')
-source=("http://download.libguestfs.org/$_pkgver_short-stable/$pkgname-$pkgver.tar.gz"{,.sig})
-sha256sums=('72b7dcdd32da1c17c932cf5a0a70b3bd68bc93e94828ad66a539f2e616adb025'
+source=("https://download.libguestfs.org/${_pkgver_short}-stable/${_pkgname}-${pkgver}.tar.gz"{,.sig})
+sha256sums=('11c5a39f241b514558f9a734b7dc1606a9b7cc5b1c8f3c5797a395547a3530ae'
             'SKIP')
 validpgpkeys=('F7774FB1AD074A7E8C8767EA91738F73E1B768A0') # Richard W.M. Jones <rjones@redhat.com>
 
