@@ -56,27 +56,28 @@ ENV USER=arch
 
 #### libguestfs linux core
 
-RUN sudo pacman -Syy \
-    ; sudo pacman -S mkinitcpio linux linux-headers linux-lts --noconfirm \
-    && export SUPERMIN_KERNEL=/boot/vmlinuz-linux \
-    && export SUPERMIN_MODULES="/lib/modules/$(uname -r)" \
-    && sudo pacman -U "${LIBGUESTFS_PACKAGE_URL}" --noconfirm \
-    && sudo pacman -U "${SUPERMIN_PACKAGE_URL}" --noconfirm \
-    && rm -rf /var/tmp/.guestfs-* \
-    ; libguestfs-test-tool || exit 1
+RUN sudo pacman -Syyu --noconfirm \
+    && sudo pacman -S mkinitcpio linux linux-headers linux-lts --noconfirm
+RUN export SUPERMIN_KERNEL=/boot/vmlinuz-linux
+RUN export SUPERMIN_MODULES="/lib/modules/$(uname -r)"
+RUN sudo pacman -U "${LIBGUESTFS_PACKAGE_URL}" --noconfirm
+RUN sudo pacman -U "${SUPERMIN_PACKAGE_URL}" --noconfirm
+RUN rm -rf /var/tmp/.guestfs-*
+RUN libguestfs-test-tool || exit 1
 
 ####
 
 #### libguestfs linux-lts
 
-# 5.13+ problem resolved by building the qcow2 against 5.12 using libguestfs-1.44.1-6
+ENV SUPERMIN_KERNEL=/boot/vmlinuz-linux-lts
+ENV SUPERMIN_MODULES="/lib/modules/$(ls /lib/modules/ | grep lts)"
 
 RUN sudo pacman -Syy \
     && export SUPERMIN_KERNEL=/boot/vmlinuz-linux-lts \
     && export SUPERMIN_MODULES="/lib/modules/$(ls /lib/modules/ | grep lts)" \
-    ; sudo pacman -S mkinitcpio --noconfirm \
+    && sudo pacman -S mkinitcpio --noconfirm \
     && rm -rf /var/tmp/.guestfs-* \
-    ; libguestfs-test-tool || exit 1
+    && libguestfs-test-tool || exit 1
 
 ####
 
