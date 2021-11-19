@@ -20,6 +20,7 @@ ENV SUPERMIN_KERNEL_VERSION=5.12.14-arch1-1
 ENV KERNEL_PACKAGE_URL=https://archive.archlinux.org/packages/l/linux/linux-5.12.14.arch1-1-x86_64.pkg.tar.zst
 ENV KERNEL_HEADERS_PACKAGE_URL=https://archive.archlinux.org/packages/l/linux/linux-headers-5.12.14.arch1-1-x86_64.pkg.tar.zst
 ENV LIBGUESTFS_PACKAGE_URL=https://archive.archlinux.org/packages/l/libguestfs/libguestfs-1.44.1-6-x86_64.pkg.tar.zst
+ENV SUPERMIN_PACKAGE_URL=https://archive.archlinux.org/packages/s/supermin/supermin-5.3.1-1-x86_64.pkg.tar.zst
 
 # OPTIONAL: Arch Linux server mirrors for super fast builds
 # set RANKMIRRORS to any value other that nothing, e.g. -e RANKMIRRORS=true
@@ -43,8 +44,8 @@ RUN if [[ "${RANKMIRRORS}" ]]; then \
 # This fails on hub.docker.com, useful for debugging in cloud
 # RUN [[ $(egrep -c '(svm|vmx)' /proc/cpuinfo) -gt 0 ]] || { echo KVM not possible on this host && exit 1; }
 
-# RUN tee -a /etc/pacman.conf <<< '[community-testing]' \
-#     && tee -a /etc/pacman.conf <<< 'Include = /etc/pacman.d/mirrorlist'
+RUN tee -a /etc/pacman.conf <<< '[community-testing]' \
+    && tee -a /etc/pacman.conf <<< 'Include = /etc/pacman.d/mirrorlist'
 
 RUN pacman -Syu git zip vim nano alsa-utils openssh --noconfirm \
     && ln -s /bin/vim /bin/vi \
@@ -84,9 +85,12 @@ RUN sudo pacman -Syy \
     ; sudo pacman -S mkinitcpio --noconfirm \
     && sudo pacman -U "${KERNEL_PACKAGE_URL}" --noconfirm \
     && sudo pacman -U "${LIBGUESTFS_PACKAGE_URL}" --noconfirm \
+    && sudo pacman -U "${SUPERMIN_PACKAGE_URL}" --noconfirm \
     && rm -rf /var/tmp/.guestfs-* \
     ; libguestfs-test-tool || exit 1
 
 ####
 
-CMD echo "Gucci"
+CMD uname -r \
+    && supermin --version \
+    && echo "Gucci" \
