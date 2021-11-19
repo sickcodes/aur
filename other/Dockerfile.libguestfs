@@ -14,12 +14,13 @@ SHELL ["/bin/bash", "-c"]
 ENV LIBGUESTFS_DEBUG=1
 ENV LIBGUESTFS_TRACE=1
 
-ENV SUPERMIN_KERNEL=/boot/vmlinuz-linux
-ENV SUPERMIN_MODULES=/lib/modules/5.12.14-arch1-1
-ENV SUPERMIN_KERNEL_VERSION=5.12.14-arch1-1
+# ENV SUPERMIN_KERNEL=/boot/vmlinuz-linux
+# ENV SUPERMIN_MODULES=/lib/modules/5.12.14-arch1-1
+# ENV SUPERMIN_KERNEL_VERSION=5.12.14-arch1-1
 ENV KERNEL_PACKAGE_URL=https://archive.archlinux.org/packages/l/linux/linux-5.12.14.arch1-1-x86_64.pkg.tar.zst
 ENV KERNEL_HEADERS_PACKAGE_URL=https://archive.archlinux.org/packages/l/linux/linux-headers-5.12.14.arch1-1-x86_64.pkg.tar.zst
-ENV LIBGUESTFS_PACKAGE_URL=https://archive.archlinux.org/packages/l/libguestfs/libguestfs-1.44.1-6-x86_64.pkg.tar.zst
+# ENV LIBGUESTFS_PACKAGE_URL=https://archive.archlinux.org/packages/l/libguestfs/libguestfs-1.44.1-6-x86_64.pkg.tar.zst
+ENV LIBGUESTFS_PACKAGE_URL=https://archive.archlinux.org/packages/l/libguestfs/libguestfs-1.46.0-1-x86_64.pkg.tar.zst
 ENV SUPERMIN_PACKAGE_URL=https://archive.archlinux.org/packages/s/supermin/supermin-5.3.1-1-x86_64.pkg.tar.zst
 
 # OPTIONAL: Arch Linux server mirrors for super fast builds
@@ -41,51 +42,39 @@ RUN if [[ "${RANKMIRRORS}" ]]; then \
         && cat /etc/pacman.d/mirrorlist \
     ; fi
 
-# This fails on hub.docker.com, useful for debugging in cloud
-# RUN [[ $(egrep -c '(svm|vmx)' /proc/cpuinfo) -gt 0 ]] || { echo KVM not possible on this host && exit 1; }
-
 RUN tee -a /etc/pacman.conf <<< '[community-testing]' \
     && tee -a /etc/pacman.conf <<< 'Include = /etc/pacman.d/mirrorlist'
 
-RUN pacman -Syu git zip vim nano alsa-utils openssh --noconfirm \
-    && ln -s /bin/vim /bin/vi \
-    && useradd arch -p arch \
+RUN useradd arch -p arch \
     && tee -a /etc/sudoers <<< 'arch ALL=(ALL) NOPASSWD: ALL' \
     && mkdir /home/arch \
     && chown arch:arch /home/arch
-
-# allow ssh to container
-RUN mkdir -m 700 /root/.ssh
-
-WORKDIR /root/.ssh
-RUN touch authorized_keys \
-    && chmod 644 authorized_keys
-
-WORKDIR /etc/ssh
-RUN tee -a sshd_config <<< 'AllowTcpForwarding yes' \
-    && tee -a sshd_config <<< 'PermitTunnel yes' \
-    && tee -a sshd_config <<< 'X11Forwarding yes' \
-    && tee -a sshd_config <<< 'PasswordAuthentication yes' \
-    && tee -a sshd_config <<< 'PermitRootLogin yes' \
-    && tee -a sshd_config <<< 'PubkeyAuthentication yes' \
-    && tee -a sshd_config <<< 'HostKey /etc/ssh/ssh_host_rsa_key' \
-    && tee -a sshd_config <<< 'HostKey /etc/ssh/ssh_host_ecdsa_key' \
-    && tee -a sshd_config <<< 'HostKey /etc/ssh/ssh_host_ed25519_key'
 
 USER arch
 
 ENV USER=arch
 
-#### libguestfs versioning
+#### libguestfs linux core
+
+RUN sudo pacman -Syy \
+    ; sudo pacman -S mkinitcpio linux linux-headers linux-lts --noconfirm \
+    && export SUPERMIN_KERNEL=/boot/vmlinuz-linux \
+    && export SUPERMIN_MODULES="/lib/modules/$(uname -r)" \
+    && sudo pacman -U "${LIBGUESTFS_PACKAGE_URL}" --noconfirm \
+    && sudo pacman -U "${SUPERMIN_PACKAGE_URL}" --noconfirm \
+    && rm -rf /var/tmp/.guestfs-* \
+    ; libguestfs-test-tool || exit 1
+
+####
+
+#### libguestfs linux-lts
 
 # 5.13+ problem resolved by building the qcow2 against 5.12 using libguestfs-1.44.1-6
 
 RUN sudo pacman -Syy \
-    && sudo pacman -Rns linux --noconfirm \
+    && export SUPERMIN_KERNEL=/boot/vmlinuz-linux-lts \
+    && export SUPERMIN_MODULES="/lib/modules/$(ls /lib/modules/ | grep lts)" \
     ; sudo pacman -S mkinitcpio --noconfirm \
-    && sudo pacman -U "${KERNEL_PACKAGE_URL}" --noconfirm \
-    && sudo pacman -U "${LIBGUESTFS_PACKAGE_URL}" --noconfirm \
-    && sudo pacman -U "${SUPERMIN_PACKAGE_URL}" --noconfirm \
     && rm -rf /var/tmp/.guestfs-* \
     ; libguestfs-test-tool || exit 1
 
