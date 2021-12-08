@@ -1,0 +1,60 @@
+# Maintainer: Sick Codes <info at sick.codes>
+
+pkgname=qnx-modules-dkms
+_pkgname=${pkgname%-*}
+_pkgbase=${pkgname%%-*}
+pkgver=5
+arch="$(uname -r)"
+url='https://github.com/sickcodes/qnx-modules'
+pkgrel=15
+pkgdesc='QNX4 and QNX6 FileSystem Types as Kernel Modules (dkms). BlackBerry qnxfs compatible.'
+arch=('x86_64' 'aarch64' 'i386')
+license=('GPL3')
+provides=("${_pkgname}")
+depends=('linux-headers' 'dkms' 'bcc-tools' 'bcc' 'bpf')
+makedepends=('git')
+source=("git+${url}.git")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "${srcdir}/${_pkgname}"
+}
+
+build() {
+  
+  cd "${srcdir}/${_pkgname}/qnx4"
+  make
+  
+  cd "${srcdir}/${_pkgname}/qnx6"
+  make
+  
+}
+
+
+package() {
+  
+  cd "${srcdir}/${_pkgname}"
+
+  install -Ddm755 "${pkgdir}/usr/lib/modules-load.d/"
+  install -Ddm755 "${pkgdir}/usr/src/qnx4/"
+  install -Ddm755 "${pkgdir}/usr/src/qnx6/"
+  install -Dm644 "${srcdir}/${_pkgname}/qnx4/dkms.conf" "${pkgdir}/usr/lib/modules-load.d/qnx4.conf"
+  install -Dm644 "${srcdir}/${_pkgname}/qnx6/dkms.conf" "${pkgdir}/usr/lib/modules-load.d/qnx6.conf"
+
+  cp -dr --no-preserve=ownership "${srcdir}/${_pkgname}/qnx4/"* "${pkgdir}/usr/src/qnx4/"
+  cp -dr --no-preserve=ownership "${srcdir}/${_pkgname}/qnx6/"* "${pkgdir}/usr/src/qnx6/"
+
+  cd "${srcdir}/${_pkgname}/qnx4"
+  make DESTDIR="${pkgdir}/usr/src/qnx4/" install
+
+  cd "${srcdir}/${_pkgname}/qnx6"
+  make DESTDIR="${pkgdir}/usr/src/qnx6/" install
+  
+  echo '** To activate qnx4_linux and qnx6_linux **
+# $ sudo modprobe qnx4 qnx6'
+  
+}
+
+# sudo modprobe qnx4 qnx6
+
+# vim:set ts=2 sw=2 et:
