@@ -32,6 +32,8 @@ package() {
 
   ln -s "${pkgdir}/opt/${_opt_folder}/qde" "${pkgdir}/usr/bin/qde"
 
+  chmod a+x "${pkgdir}/opt/${_opt_folder}/qde" "${pkgdir}/usr/bin/qde"
+
   echo "momentics is located at /opt/${_opt_folder}"
   echo "start momentics using /usr/bin/qde"
 
