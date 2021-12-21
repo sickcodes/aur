@@ -1,57 +1,59 @@
-# Maintainer: Sick Codes <info at sick.codes>
+# Maintainer: Sick Codes <info at sick dot codes>
 
 pkgname=qnx-modules-dkms
 _pkgname=${pkgname%-*}
-_pkgbase=${pkgname%%-*}
-pkgver=5
+pkgver=r9.11df204
 arch="$(uname -r)"
 url='https://github.com/sickcodes/qnx-modules'
-pkgrel=15
+pkgrel=1
 pkgdesc='QNX4 and QNX6 FileSystem Types as Kernel Modules (dkms). BlackBerry qnxfs compatible.'
 arch=('x86_64' 'aarch64' 'i386')
 license=('GPL3')
 provides=("${_pkgname}")
-depends=('linux-headers' 'dkms' 'bcc-tools' 'bcc' 'bpf')
+depends=('dkms')
 makedepends=('git')
-source=("git+${url}.git")
+source=("git+${url}.git"#commit=11df204f32640c7d5ea402f3afd828a085504a3a)
 sha256sums=('SKIP')
 
-prepare() {
-  cd "${srcdir}/${_pkgname}"
+pkgver() {
+  cd "${_pkgname}"
+  printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-build() {
-  
-  cd "${srcdir}/${_pkgname}/qnx4"
-  make
-  
-  cd "${srcdir}/${_pkgname}/qnx6"
-  make
-  
-}
-
+# prepare() {
+#   cd "${srcdir}/${_pkgname}"
+# }
 
 package() {
   
   cd "${srcdir}/${_pkgname}"
 
-  install -Ddm755 "${pkgdir}/usr/lib/modules-load.d/"
-  install -Ddm755 "${pkgdir}/usr/src/qnx4/"
-  install -Ddm755 "${pkgdir}/usr/src/qnx6/"
-  install -Dm644 "${srcdir}/${_pkgname}/qnx4/dkms.conf" "${pkgdir}/usr/lib/modules-load.d/qnx4.conf"
-  install -Dm644 "${srcdir}/${_pkgname}/qnx6/dkms.conf" "${pkgdir}/usr/lib/modules-load.d/qnx6.conf"
+  install -Ddm755 "${pkgdir}/usr/src/qnx4-${pkgver}/"
+  install -Ddm755 "${pkgdir}/usr/src/qnx6-${pkgver}/"
 
-  cp -dr --no-preserve=ownership "${srcdir}/${_pkgname}/qnx4/"* "${pkgdir}/usr/src/qnx4/"
-  cp -dr --no-preserve=ownership "${srcdir}/${_pkgname}/qnx6/"* "${pkgdir}/usr/src/qnx6/"
+  cp -dr --preserve=ownership "${srcdir}/${_pkgname}/qnx4/"* "${pkgdir}/usr/src/qnx4-${pkgver}/"
+  cp -dr --preserve=ownership "${srcdir}/${_pkgname}/qnx6/"* "${pkgdir}/usr/src/qnx6-${pkgver}/"
 
   cd "${srcdir}/${_pkgname}/qnx4"
-  make DESTDIR="${pkgdir}/usr/src/qnx4/" install
+  make
+  make DESTDIR="${pkgdir}/usr/src/qnx4-${pkgver}/" install
 
   cd "${srcdir}/${_pkgname}/qnx6"
-  make DESTDIR="${pkgdir}/usr/src/qnx6/" install
-  
-  echo '** To activate qnx4_linux and qnx6_linux **
-# $ sudo modprobe qnx4 qnx6'
+  make
+  make DESTDIR="${pkgdir}/usr/src/qnx6-${pkgver}/" install
+
+  # Set name and version
+  sed -e "s/@_PKGBASE@/qnx4/" \
+      -e "s/@PKGVER@/${pkgver}/" \
+      -i "${pkgdir}/usr/src/qnx4-${pkgver}/dkms.conf"
+
+  sed -e "s/@_PKGBASE@/qnx6/" \
+      -e "s/@PKGVER@/${pkgver}/" \
+         "${pkgdir}/usr/src/qnx6-${pkgver}/dkms.conf"
+
+  echo '** To activate qnx4 and/or qnx6 **
+# $ sudo modprobe qnx4
+# $ sudo modprobe qnx6'
   
 }
 
