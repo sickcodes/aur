@@ -18,7 +18,7 @@ provides=(${pkgname}
 )
 depends=()
 optdepends=()
-makedepends=(curl python3 mpc mpfr gmp texinfo gperf libtool patchutils bc zlib expat)
+makedepends=(curl python3 libmpc mpfr gmp texinfo gperf libtool patchutils bc zlib expat)
 source=(
   "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/${pkgver}/riscv32-elf-${_pkg_prefix}-${pkgver}-nightly.tar.gz"
   "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/${pkgver}/riscv32-glibc-${_pkg_prefix}-${pkgver}-nightly.tar.gz"
