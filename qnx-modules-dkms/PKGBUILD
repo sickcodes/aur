@@ -60,7 +60,3 @@ package() {
 # sudo modprobe qnx4 qnx6
 
 # vim:set ts=2 sw=2 et:
-
-
-for QNX_VERSION in (qnx4 qnx6); do
-  
