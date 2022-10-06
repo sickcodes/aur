@@ -2,7 +2,7 @@
 
 pkgname=qnx-modules-dkms
 _pkgname=${pkgname%-*}
-pkgver=r9.11df204
+pkgver=r11.1b6659c
 arch="$(uname -r)"
 url='https://github.com/sickcodes/qnx-modules'
 pkgrel=1
@@ -60,3 +60,7 @@ package() {
 # sudo modprobe qnx4 qnx6
 
 # vim:set ts=2 sw=2 et:
+
+
+for QNX_VERSION in (qnx4 qnx6); do
+  
