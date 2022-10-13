@@ -19,7 +19,8 @@ provides=(${pkgname}
 )
 depends=()
 optdepends=()
-makedepends=(curl python3 libmpc mpfr gmp texinfo gperf libtool patchutils bc zlib expat)
+makedepends=()
+options=(!strip)
 source=(
   "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/${pkgver}/riscv32-elf-${_pkg_prefix}-${pkgver}-nightly.tar.gz"
   "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/${pkgver}/riscv32-glibc-${_pkg_prefix}-${pkgver}-nightly.tar.gz"
@@ -35,27 +36,12 @@ sha256sums=(
 )
 
 package() {
-  
-  rm -rf "${srcdir}"/riscv/sysroot
-  rm -rf "${srcdir}"/riscv/riscv64-unknown-linux-gnu
-  rm -rf "${srcdir}"/riscv/riscv32-unknown-linux-gnu
-  rm -rf "${srcdir}"/riscv/riscv64-unknown-elf
-  rm -rf "${srcdir}"/riscv/riscv32-unknown-elf
+  install -dm755 "${pkgdir}"/usr/
 
-  install -dm755 ${pkgdir}/usr/libexec
-  install -dm755 ${pkgdir}/usr/share
-  install -dm755 ${pkgdir}/usr/bin
-  install -dm755 ${pkgdir}/usr/lib
+  cp -pr "${srcdir}"/riscv/* "${pkgdir}"/usr/
 
-  cp -pvr "${srcdir}"/riscv/libexec/* "${pkgdir}"/usr/libexec/
-  cp -pvr "${srcdir}"/riscv/share/* "${pkgdir}"/usr/share/
-  cp -pvr "${srcdir}"/riscv/bin/* "${pkgdir}"/usr/bin/
-  cp -pvr "${srcdir}"/riscv/lib/* "${pkgdir}"/usr/lib/
-
-  # strip host binaries
-  find "${pkgdir}"/usr/bin/ "${pkgdir}"/usr/lib/gcc/ -type f -and \( -executable \) -exec strip '{}' \;
-
-  # Remove existing conflicts
+  # Remove existing conflicts with gcc and other packages
+  rm -rf "${pkgdir}"/usr/include/gdb/jit-reader.h
   rm -rf "${pkgdir}"/usr/share/man/man7
   rm -rf "${pkgdir}"/usr/lib/libcc1.so*
   rm -rf "${pkgdir}"/usr/lib/bfd-plugins/libdep.so
@@ -64,5 +50,4 @@ package() {
   rm -rf "${pkgdir}"/usr/share/gdb/syscalls
   rm -rf "${pkgdir}"/usr/share/gdb/system-gdbinit
   rm -rf "${pkgdir}"/usr/share/info
-
 }
