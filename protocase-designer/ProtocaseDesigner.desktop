@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Protocase Designer
+GenericName=Protocase Designer
+Comment=Protocase Designer lets you create custom metal enclosures.
+Exec=/opt/ProtocaseDesigner/ProtocaseDesigner %U
+Icon=/opt/ProtocaseDesigner/ProtocaseDesigner.png
+Terminal=false
+Type=Application
+StartupNotify=true
